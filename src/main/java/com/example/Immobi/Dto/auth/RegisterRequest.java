@@ -1,5 +1,6 @@
-package com.example.Immobi.Core.dto.auth;
+package com.example.Immobi.Dto.auth;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -17,4 +18,8 @@ public class RegisterRequest {
     @NotBlank(message = "Password is required")
     @Size(min = 6, max = 20, message = "Password must be between 6 and 20 characters")
     private String password;
+    
+    @Email(message = "Invalid email address")
+    private String email;
+    
 } 

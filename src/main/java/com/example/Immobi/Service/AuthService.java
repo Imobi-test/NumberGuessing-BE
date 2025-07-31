@@ -1,15 +1,14 @@
-package com.example.Immobi.service;
+package com.example.Immobi.Service;
 
-import com.example.Immobi.Core.dto.auth.AuthResponse;
-import com.example.Immobi.Core.dto.auth.LoginRequest;
-import com.example.Immobi.Core.dto.auth.RegisterRequest;
+import com.example.Immobi.Dto.auth.AuthResponse;
+import com.example.Immobi.Dto.auth.LoginRequest;
+import com.example.Immobi.Dto.auth.RegisterRequest;
 import com.example.Immobi.Core.exception.BusinessException;
 import com.example.Immobi.Core.exception.ErrorCode;
 import com.example.Immobi.Core.security.JwtUtil;
 import com.example.Immobi.Entity.User;
 import com.example.Immobi.Repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -60,7 +59,8 @@ public class AuthService {
         // Create new user
         User user = new User(
                 request.getUsername(),
-                passwordEncoder.encode(request.getPassword())
+                passwordEncoder.encode(request.getPassword()),
+                request.getEmail()
         );
 
         // Save user to database

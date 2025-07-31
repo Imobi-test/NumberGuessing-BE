@@ -1,4 +1,4 @@
-package com.example.Immobi.Core.dto.game;
+package com.example.Immobi.Dto.game;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

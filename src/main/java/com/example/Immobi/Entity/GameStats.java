@@ -16,7 +16,7 @@ import lombok.Setter;
 @Setter
 public class GameStats {
     
-    private static final int DEFAULT_INITIAL_TURNS = 10;
+    private static final int DEFAULT_INITIAL_TURNS = 5;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,5 +80,16 @@ public class GameStats {
      */
     public void resetTurns() {
         this.remainingTurns = DEFAULT_INITIAL_TURNS;
+    }
+    
+    /**
+     * Add additional turns 
+     * 
+     * @param turnsToAdd Number of turns to add
+     */
+    public void addTurns(int turnsToAdd) {
+        if (turnsToAdd > 0) {
+            this.remainingTurns += turnsToAdd;
+        }
     }
 } 

@@ -30,13 +30,17 @@ public class User implements UserDetails {
     
     @Column(nullable = false)
     private String password;
-    
+
+    @Column(nullable = false)
+    private String email;
+
     // Constructor for registration
-    public User(String username, String password) {
+    public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
+        this.email = email;
     }
-    
+
     // UserDetails implementation
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,9 +1,12 @@
 package com.example.Immobi.Core.exception;
 
+import lombok.Getter;
+
 /**
  * Author: QuanNH
  * Standardized error codes for the application
  */
+@Getter
 public enum ErrorCode {
     // Authentication errors (1000-1099)
     AUTHENTICATION_FAILED(1000, "Authentication failed"),
@@ -42,12 +45,5 @@ public enum ErrorCode {
         this.code = code;
         this.message = message;
     }
-    
-    public int getCode() {
-        return code;
-    }
-    
-    public String getMessage() {
-        return message;
-    }
+
 }

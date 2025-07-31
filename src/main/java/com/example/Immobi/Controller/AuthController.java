@@ -1,10 +1,10 @@
 package com.example.Immobi.Controller;
 
 import com.example.Immobi.Core.dto.BaseResponse;
-import com.example.Immobi.Core.dto.auth.AuthResponse;
-import com.example.Immobi.Core.dto.auth.LoginRequest;
-import com.example.Immobi.Core.dto.auth.RegisterRequest;
-import com.example.Immobi.service.AuthService;
+import com.example.Immobi.Dto.auth.AuthResponse;
+import com.example.Immobi.Dto.auth.LoginRequest;
+import com.example.Immobi.Dto.auth.RegisterRequest;
+import com.example.Immobi.Service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +36,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Register a new user", description = "Creates a new user account and returns authentication token")
+    @Operation(summary = "User Register", description = "Creates a new user account and returns authentication token")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "User registered successfully", 
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = BaseResponse.class))),
@@ -51,7 +51,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Authenticate user", description = "Validates credentials and returns authentication token")
+    @Operation(summary = "User login", description = "Validates credentials and returns authentication token")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Login successful", 
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = BaseResponse.class))),

@@ -50,7 +50,6 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/api-docs/**").permitAll()
                 .requestMatchers("/swagger-ui.html").permitAll()
-                .requestMatchers("/v3/api-docs/**").permitAll()
                 // Game endpoints require authentication
                 .requestMatchers("/api/game/**").authenticated()
                 // All other requests need authentication

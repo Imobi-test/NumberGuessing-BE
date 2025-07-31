@@ -6,39 +6,46 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.LockModeType;
+import java.util.List;
 import java.util.Optional;
 
-/**
- * Author: QuanNH
- * Repository for GameStats entity operations
- */
+@Repository
 public interface GameStatsRepository extends JpaRepository<GameStats, Long> {
     
     /**
-     * Find game stats by player
-     * 
-     * @param player The player
-     * @return Optional GameStats for the player
+     * Find stats by player with pessimistic write lock
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT gs FROM GameStats gs WHERE gs.player.id = :playerId")
+    Optional<GameStats> findByUserIdWithLock(@Param("playerId") Long playerId);
+    
+    /**
+     * Find stats by player
      */
     Optional<GameStats> findByPlayer(User player);
     
     /**
-     * Find player's game stats with pessimistic lock to prevent concurrent modifications
+     * Find top players ordered by score
      * 
-     * @param playerId Player's ID
-     * @return Optional GameStats with lock
+     * @param limit Number of players to return
+     * @return List of GameStats for top players
      */
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT g FROM GameStats g WHERE g.player.id = :playerId")
-    Optional<GameStats> findByUserIdWithLock(@Param("playerId") Long playerId);
+    @Query("SELECT gs FROM GameStats gs JOIN FETCH gs.player ORDER BY gs.score DESC")   
+    List<GameStats> findTopPlayersByScore(int limit);
     
     /**
-     * Check if player has game stats
-     * 
-     * @param player The player
-     * @return True if player has game stats
+     * Find player stats by user id with eager loading of player data
      */
-    boolean existsByPlayer(User player);
+    @Query("SELECT gs FROM GameStats gs JOIN FETCH gs.player WHERE gs.player.id = :playerId")
+    Optional<GameStats> findByPlayerIdWithPlayer(@Param("playerId") Long playerId);
+    
+    /**
+     * Get player's rank based on score
+     */
+    @Query(value = "SELECT (COUNT(*) + 1) FROM game_stats WHERE score > (SELECT score FROM game_stats WHERE player_id = :playerId)", 
+           nativeQuery = true)
+    int getPlayerRank(@Param("playerId") Long playerId);
 } 

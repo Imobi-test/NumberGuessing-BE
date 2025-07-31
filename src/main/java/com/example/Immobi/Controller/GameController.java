@@ -1,10 +1,12 @@
 package com.example.Immobi.Controller;
 
 import com.example.Immobi.Core.dto.BaseResponse;
+import com.example.Immobi.Dto.game.BuyTurnsResponse;
 import com.example.Immobi.Core.dto.game.GuessRequest;
-import com.example.Immobi.Core.dto.game.GuessResponse;
+import com.example.Immobi.Dto.game.GuessResponse;
+import com.example.Immobi.Entity.GameStats;
 import com.example.Immobi.Entity.User;
-import com.example.Immobi.service.GameService;
+import com.example.Immobi.Service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,10 +35,6 @@ public class GameController {
 
     /**
      * Process a player's guess
-     * 
-     * @param player The authenticated player
-     * @param guessRequest The guess request
-     * @return Response with guess result
      */
     @PostMapping("/guess")
     @Operation(
@@ -64,9 +62,6 @@ public class GameController {
     
     /**
      * Create appropriate response message based on guess result
-     * 
-     * @param isCorrectGuess Whether the guess was correct
-     * @return Response message
      */
     private String createResponseMessage(boolean isCorrectGuess) {
         return isCorrectGuess 
@@ -75,11 +70,30 @@ public class GameController {
     }
     
     /**
-     * Reset a player's turns to default value
-     * 
-     * @param player The authenticated player
-     * @return Response indicating success
+     * Buy additional turns for the player
      */
+    @PostMapping("/buy-turns")
+    @Operation(summary = "Buy additional turns", description = "Purchase 5 more turns")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Turns purchased successfully", 
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Not authenticated"),
+        @ApiResponse(responseCode = "402", description = "Payment required/failed")
+    })
+    public ResponseEntity<BaseResponse<BuyTurnsResponse>> buyTurns(@AuthenticationPrincipal User player) {
+        GameStats updatedStats = gameService.buyAdditionalTurns(player);
+        
+        BuyTurnsResponse response = BuyTurnsResponse.builder()
+                .successful(true)
+                .newTurnCount(updatedStats.getRemainingTurns())
+                .turnsAdded(5)
+                .currentScore(updatedStats.getScore())
+                .paymentMessage("Payment successful. 5 turns have been added to your account.")
+                .build();
+        
+        return ResponseEntity.ok(BaseResponse.success(response, "Turns purchased successfully"));
+    }
+    
     @PostMapping("/reset")
     @Operation(summary = "Reset turns", description = "Reset player's turns to default value")
     public ResponseEntity<BaseResponse<Void>> resetTurns(@AuthenticationPrincipal User player) {

@@ -1,4 +1,4 @@
-package com.example.Immobi.Core.dto.auth;
+package com.example.Immobi.Dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

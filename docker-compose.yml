@@ -30,6 +30,35 @@ services:
     networks:
       - guessing-game-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: guessing-game-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - guessing-game-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: guessing-game-redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - guessing-game-network
+
 networks:
   guessing-game-network:
     driver: bridge
@@ -37,3 +66,4 @@ networks:
 volumes:
   postgres_data:
   pgadmin_data:
+  redis_data:
