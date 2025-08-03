@@ -2,7 +2,7 @@ package com.example.Immobi.Controller;
 
 import com.example.Immobi.Core.dto.BaseResponse;
 import com.example.Immobi.Dto.game.BuyTurnsResponse;
-import com.example.Immobi.Core.dto.game.GuessRequest;
+import com.example.Immobi.Dto.game.GuessRequest;
 import com.example.Immobi.Dto.game.GuessResponse;
 import com.example.Immobi.Entity.GameStats;
 import com.example.Immobi.Entity.User;
@@ -40,7 +40,7 @@ public class GameController {
     @Operation(
         summary = "Make a guess", 
         description = "Guess a number between " + 
-                      GuessRequest.MIN_GUESS_NUMBER + " and " + 
+                      GuessRequest.MIN_GUESS_NUMBER + " and " +
                       GuessRequest.MAX_GUESS_NUMBER
     )
     @ApiResponses(value = {

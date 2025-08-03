@@ -1,4 +1,4 @@
-package com.example.Immobi.Core.dto.game;
+package com.example.Immobi.Dto.game;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

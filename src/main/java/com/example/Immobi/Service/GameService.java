@@ -1,6 +1,6 @@
 package com.example.Immobi.Service;
 
-import com.example.Immobi.Core.dto.game.GuessRequest;
+import com.example.Immobi.Dto.game.GuessRequest;
 import com.example.Immobi.Dto.game.GuessResponse;
 import com.example.Immobi.Core.exception.BusinessException;
 import com.example.Immobi.Core.exception.ErrorCode;
