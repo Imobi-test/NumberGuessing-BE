@@ -1,6 +1,7 @@
 package com.example.Immobi.Service;
 
 import com.example.Immobi.Dto.player.LeaderboardEntryDto;
+import com.example.Immobi.Dto.game.UserRankData;
 import com.example.Immobi.Entity.GameStats;
 import com.example.Immobi.Entity.User;
 import com.example.Immobi.Repository.GameStatsRepository;
@@ -25,7 +26,6 @@ public class LeaderboardService {
 
     private static final Logger log = LoggerFactory.getLogger(LeaderboardService.class);
     private static final String LEADERBOARD_KEY = "game:leaderboard";
-    private static final int DEFAULT_LEADERBOARD_SIZE = 10;
     private static final int DEFAULT_CACHE_DAYS = 30;
     private static final String VALUE_DELIMITER = ":";
 
@@ -143,14 +143,14 @@ public class LeaderboardService {
                     
                     if (value != null && score != null) {
                         String memberValue = value.toString();
-                        UserInfo userInfo = decodeValue(memberValue);
+                        UserRankData userRankData = decodeValue(memberValue);
                         
                         // Update rank only when score changes (dense ranking)
                         sameScoreRank = Objects.equals(previousScore, score) ? sameScoreRank : rank;
                         
                         leaderboard.add(LeaderboardEntryDto.builder()
-                                .userId(userInfo.getUserId())
-                                .username(userInfo.getUsername())
+                                .userId(userRankData.getUserId())
+                                .username(userRankData.getUsername())
                                 .score(score.intValue())
                                 .rank(sameScoreRank)
                                 .build());
@@ -220,7 +220,7 @@ public class LeaderboardService {
         return String.valueOf(userId) + VALUE_DELIMITER + username;
     }
     
-    private UserInfo decodeValue(String value) {
+    private UserRankData decodeValue(String value) {
         String[] parts = value.split(VALUE_DELIMITER, 2);
         Long userId = null;
         String username = "Unknown";
@@ -237,24 +237,7 @@ public class LeaderboardService {
             username = parts[1];
         }
         
-        return new UserInfo(userId, username);
+        return new UserRankData(userId, username);
     }
-    
-    private static class UserInfo {
-        private final Long userId;
-        private final String username;
-        
-        public UserInfo(Long userId, String username) {
-            this.userId = userId;
-            this.username = username;
-        }
-        
-        public Long getUserId() {
-            return userId;
-        }
-        
-        public String getUsername() {
-            return username;
-        }
-    }
+
 } 
