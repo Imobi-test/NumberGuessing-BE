@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
- /* Author: QuanNH
+/**
+ * Author: QuanNH
  * DTO for user creation event
  */
 @Data
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreatedEnventDto {
     /**
-     * User entity
+     * User entity that was created
      */
     private User user;
 }
