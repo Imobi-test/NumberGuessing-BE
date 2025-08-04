@@ -37,6 +37,13 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Redis for caching
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'redis.clients:jedis'
+    
+    // Caching support
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
 	}
 
 tasks.named('test') {

@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     @Data
     @AllArgsConstructor
     public static class ErrorResponse {
-        private int status;
+        private int code;
         private String message;
         private LocalDateTime timestamp;
     }

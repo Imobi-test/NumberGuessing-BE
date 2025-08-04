@@ -14,6 +14,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - guessing-game-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4:7.8
@@ -30,6 +35,57 @@ services:
     networks:
       - guessing-game-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: guessing-game-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - guessing-game-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: guessing-game-redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - guessing-game-network
+
+  api:
+   build:
+     context: .
+     dockerfile: Dockerfile
+   container_name: guessing-game-api
+   ports:
+     - "9002:9002"
+   environment:
+     - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/guessing_game
+     - SPRING_DATASOURCE_USERNAME=postgres
+     - SPRING_DATASOURCE_PASSWORD=postgres
+     - SPRING_REDIS_HOST=redis
+     - SPRING_REDIS_PORT=6379
+   depends_on:
+     postgres:
+       condition: service_healthy
+     redis:
+       condition: service_healthy
+   networks:
+     - guessing-game-network
+   restart: unless-stopped
+
 networks:
   guessing-game-network:
     driver: bridge
@@ -37,3 +93,4 @@ networks:
 volumes:
   postgres_data:
   pgadmin_data:
+  redis_data:
