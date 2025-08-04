@@ -77,6 +77,7 @@ services:
      - SPRING_DATASOURCE_PASSWORD=postgres
      - SPRING_REDIS_HOST=redis
      - SPRING_REDIS_PORT=6379
+     - JWT_SECRET=WCA#j42Z@p!3vL9u$Qx7Kr%M0eC^Bn6Ya+TGmDsZ
    depends_on:
      postgres:
        condition: service_healthy
@@ -88,7 +89,7 @@ services:
 
 networks:
   guessing-game-network:
-    driver: bridge
+    external: true
 
 volumes:
   postgres_data:

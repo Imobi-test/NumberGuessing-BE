@@ -1,6 +1,6 @@
 # NumberGuessing-BE
 
-Ứng dụng backend cho trò chơi đoán số với Spring Boot, PostgreSQL, Redis và JWT Authentication.
+##Ứng dụng backend cho trò chơi đoán số với Spring Boot, PostgreSQL, Redis và JWT Authentication.
 
 ## Tôi đã cài đặt giao diện cho game, vui lòng clone NumberGuessing-FE repo và làm theo hướng dãn trong file readme.md
 
@@ -33,6 +33,8 @@ cd NumberGuessing-BE
 ### 2. Kiểm tra Docker
 
 ```bash
+docker network create guessing-game-network
+## Nếu Đã tạo ra network thì không tạo lại 
 docker-compose up -d
 ```
 
