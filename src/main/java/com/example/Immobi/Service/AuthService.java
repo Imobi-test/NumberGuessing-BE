@@ -1,6 +1,7 @@
 package com.example.Immobi.Service;
 
 import com.example.Immobi.Dto.auth.AuthResponse;
+import com.example.Immobi.Dto.auth.CreatedEnventDto;
 import com.example.Immobi.Dto.auth.LoginRequest;
 import com.example.Immobi.Dto.auth.RegisterRequest;
 import com.example.Immobi.Core.exception.BusinessException;
@@ -15,6 +16,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * Author: QuanNH
@@ -22,12 +25,14 @@ import org.springframework.stereotype.Service;
  * Manages user registration and login processes
  */
 @Service
+@Transactional
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final ApplicationEventPublisher publisher;
 
     /**
      * Constructor with dependency injection
@@ -36,11 +41,13 @@ public class AuthService {
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            JwtUtil jwtUtil) {
+            JwtUtil jwtUtil,
+            ApplicationEventPublisher publisher) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.publisher = publisher;
     }
 
     /**
@@ -50,6 +57,7 @@ public class AuthService {
      * @return Authentication response with JWT token
      * @throws BusinessException if username already exists
      */
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         // Check if username already exists
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -65,6 +73,9 @@ public class AuthService {
 
         // Save user to database
         userRepository.save(user);
+
+        // Publish user creation event
+        publisher.publishEvent(new CreatedEnventDto(user));
 
         // Generate JWT token
         String token = jwtUtil.generateToken(user);

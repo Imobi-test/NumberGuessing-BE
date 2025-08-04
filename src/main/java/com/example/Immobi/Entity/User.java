@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import com.example.Immobi.Core.config.trigger.UserEntityListener;
 
 /**
  * Author: QuanNH
@@ -17,7 +16,6 @@ import com.example.Immobi.Core.config.trigger.UserEntityListener;
  */
 @Entity
 @Table(name = "users")
-@EntityListeners(UserEntityListener.class)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,38 +1,41 @@
 package com.example.Immobi.Core.config.trigger;
 
+import com.example.Immobi.Dto.auth.CreatedEnventDto;
 import com.example.Immobi.Entity.User;
 import com.example.Immobi.Entity.GameStats;
 import com.example.Immobi.Repository.GameStatsRepository;
 import com.example.Immobi.Service.LeaderboardService;
-import jakarta.persistence.PostPersist;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * Author: QuanNH
- * Entity listener for User entity to handle post-persist operations
+ * Entity listener for User entity to handle post-commit operations
  */
 @Component
 public class UserEntityListener {
 
-    private GameStatsRepository gameStatsRepository;
-    private LeaderboardService leaderboardService;
+    private final GameStatsRepository gameStatsRepository;
+    private final LeaderboardService leaderboardService;
+
+    private final Integer DEFAULT_SCORES = 0;
 
     @Autowired
-    public void setGameStatsRepository(GameStatsRepository gameStatsRepository) {
+    public UserEntityListener(@Lazy GameStatsRepository gameStatsRepository,
+                            @Lazy LeaderboardService leaderboardService) {
         this.gameStatsRepository = gameStatsRepository;
-    }
-
-    @Autowired
-    public void setLeaderboardService(LeaderboardService leaderboardService) {
         this.leaderboardService = leaderboardService;
     }
 
     /**
-     * Automatically create GameStats when a new User is persisted
+     * Automatically create GameStats when a new User is committed to database
      */
-    @PostPersist
-    public void createGameStats(User user) {
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void createGameStats(CreatedEnventDto event) {
+        var user = event.getUser();
         try {
             if (gameStatsRepository != null) {
                 // Create new GameStats for this user
@@ -41,7 +44,7 @@ public class UserEntityListener {
                 
                 // Also initialize in leaderboard
                 if (leaderboardService != null) {
-                    leaderboardService.updatePlayerScore(user.getId(), user.getUsername(), 0);
+                    leaderboardService.updatePlayerScore(user.getId(), user.getUsername(), DEFAULT_SCORES);
                 }
             }
         } catch (Exception e) {

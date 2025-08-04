@@ -31,10 +31,7 @@ public class GameStats {
     
     @Column(nullable = false)
     private Integer remainingTurns = DEFAULT_INITIAL_TURNS;
-    
-    @Version
-    private Integer version;
-    
+
     /**
      * Create game stats for a new player
      * 

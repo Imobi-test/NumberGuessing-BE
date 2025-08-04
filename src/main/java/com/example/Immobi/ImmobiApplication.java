@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Author: QuanNH
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Bean;
  */
 @SpringBootApplication
 @EnableCaching
+@EnableTransactionManagement
 public class ImmobiApplication {
 
 	public static void main(String[] args) {
@@ -25,7 +27,6 @@ public class ImmobiApplication {
 	@Bean
 	public CommandLineRunner initializeData(LeaderboardService leaderboardService) {
 		return args -> {
-			// Initialize leaderboard from database at startup
 			leaderboardService.initializeLeaderboard();
 		};
 	}
