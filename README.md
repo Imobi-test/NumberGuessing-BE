@@ -1,16 +1,27 @@
-# Number Guessing Game API
+# NumberGuessing-BE
 
-REST API cho trò chơi đoán số với bảng xếp hạng thời gian thực.
+Ứng dụng backend cho trò chơi đoán số với Spring Boot, PostgreSQL, Redis và JWT Authentication.
 
-## Yêu cầu hệ thống
+## Tôi đã cài đặt giao diện cho game, vui lòng clone NumberGuessing-FE repo và làm theo hướng dãn trong file readme.md
 
-- JDK 17+
-- Gradle 7.6+
-- Docker & Docker Compose
-- PostgreSQL (hoặc sử dụng Docker)
-- Redis (hoặc sử dụng Docker)
 
-## Cài đặt môi trường
+## 📋 Mục lục
+
+- [Yêu cầu hệ thống](#yêu-cầu-hệ-thống)
+- [Cài đặt môi trường](#cài-đặt-môi-trường)
+- [Chạy ứng dụng](#chạy-ứng-dụng)
+- [API Documentation](#api-documentation)
+- [Authentication](#authentication)
+- [Test API](#test-api)
+- [Cấu trúc project](#cấu-trúc-project)
+
+## 🖥️ Yêu cầu hệ thống
+
+- Docker và Docker Compose
+- Java 17 hoặc cao hơn
+- Gradle 7.6.1
+
+## 🚀 Cài đặt môi trường
 
 ### 1. Clone repository
 
@@ -19,164 +30,182 @@ git clone <repository-url>
 cd NumberGuessing-BE
 ```
 
-### 2. Khởi động các dịch vụ với Docker Compose
-
-Dự án đã được cấu hình với Docker Compose để chạy các dịch vụ cần thiết:
+### 2. Kiểm tra Docker
 
 ```bash
 docker-compose up -d
 ```
 
 Lệnh này sẽ khởi động:
-- PostgreSQL (cổng 5432)
-- pgAdmin (cổng 5050) - Quản lý PostgreSQL qua giao diện web
-- Redis (cổng 6379) - Cho bảng xếp hạng và caching
-- Redis Commander (cổng 8081) - Quản lý Redis qua giao diện web
+- PostgreSQL database (port 5432)
+- Redis cache (port 6379)
+- PgAdmin (port 5050)
+- Redis Commander (port 8081)
+- Spring Boot API (port 9002)
 
-### 3. Kiểm tra các dịch vụ đã khởi động
 
-Truy cập các dịch vụ quản lý:
-- pgAdmin: http://localhost:5050 (Email: admin@admin.com, Password: admin)
-- Redis Commander: http://localhost:8081
-
-## Build và chạy project
-
-Cập nhật file `docker-compose.yml` để bao gồm cả backend:
-
-```bash
-docker-compose up -d
-```
+## 📚 API Documentation
 
 ### Swagger UI
 
-Dự án tích hợp Swagger UI để dễ dàng kiểm tra API:
+Sau khi khởi động ứng dụng, truy cập Swagger UI tại:
 
 ```
 http://localhost:9002/swagger-ui.html
 ```
 
-### Xác thực (Authentication)
+### API Endpoints
 
-API sử dụng JWT (JSON Web Token) để xác thực. Bạn cần lấy token trước khi gọi các API khác.
+#### Authentication
+- `POST /api/auth/register` - Đăng ký tài khoản mới
+- `POST /api/auth/login` - Đăng nhập
 
-#### 1. Đăng ký tài khoản mới
+#### Game
+- `POST /api/game/guess` - Đoán số
+- `POST /api/game/buy-turns` - Mua thêm lượt chơi
+- `POST /api/game/reset` - Reset lượt chơi
+
+#### Player
+- `GET /api/players/leaderboard` - Xem bảng xếp hạng
+- `GET /api/players/me` - Xem thông tin profile
+- `POST /api/players/refresh-profile` - Refresh cache profile
+
+## 🔐 Authentication
+
+### 1. Đăng ký tài khoản
 
 ```bash
 curl -X POST http://localhost:9002/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123","username":"testuser"}'
-```
-
-#### 2. Đăng nhập và lấy token
-
-```bash
-curl -X POST http://localhost:9002/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123"}'
+  -d '{
+    "username": "testuser",
+    "password": "password123",
+    "email": "test@example.com"
+  }'
 ```
 
 Response:
 ```json
 {
   "success": true,
+  "message": "User registered successfully",
   "data": {
     "token": "eyJhbGciOiJIUzI1NiJ9...",
-    "type": "Bearer",
-    "email": "user@example.com",
     "username": "testuser"
-  },
-  "message": "Login successful"
+  }
 }
 ```
 
-Sử dụng token nhận được cho các request tiếp theo:
+### 2. Đăng nhập
+
+```bash
+curl -X POST http://localhost:9002/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "password": "password123"
+  }'
+```
+
+### 3. Sử dụng token
+
+Sau khi đăng nhập/đăng ký, sử dụng token trong header `Authorization`:
 
 ```bash
 curl -X GET http://localhost:9002/api/players/me \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9..."
 ```
 
-### Test các API chính
+## 🧪 Test API
 
-#### 1. Lấy thông tin người chơi hiện tại
+### 1. Test nhanh với Swagger
 
+1. Mở trình duyệt và truy cập: `http://localhost:9002/swagger-ui.html`
+2. Chọn endpoint muốn test
+3. Click "Try it out"
+4. Nhập thông tin và click "Execute"
+
+### 2. Test với cURL
+
+#### Đăng ký và đăng nhập:
 ```bash
-curl -X GET http://localhost:9002/api/players/me \
-  -H "Authorization: Bearer YOUR_TOKEN"
-```
-
-#### 2. Đoán số
-
-```bash
-curl -X POST http://localhost:9002/api/game/guess \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+# Đăng ký
+curl -X POST http://localhost:9002/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"number": 3}'
+  -d '{"username": "player1", "password": "123456", "email": "player1@test.com"}'
+
+# Đăng nhập
+curl -X POST http://localhost:9002/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "player1", "password": "123456"}'
 ```
 
-#### 3. Mua thêm lượt chơi
-
+#### Chơi game (sử dụng token từ đăng nhập):
 ```bash
-curl -X POST http://localhost:9002/api/game/buy-turns \
-  -H "Authorization: Bearer YOUR_TOKEN"
+# Đoán số
+curl -X POST http://localhost:9002/api/game/guess \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{"guessNumber": 50}'
+
+# Xem profile
+curl -X GET http://localhost:9002/api/players/me \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+
+# Xem leaderboard
+curl -X GET http://localhost:9002/api/players/leaderboard
 ```
 
-#### 4. Xem bảng xếp hạng
+### 3. Test với Postman
 
-```bash
-curl -X GET http://localhost:9002/api/players/leaderboard \
-  -H "Authorization: Bearer YOUR_TOKEN"
+1. Import collection từ Swagger UI
+2. Set up environment variables cho token
+3. Test các endpoints
+
+## 🗄️ Database Management
+
+### PgAdmin (PostgreSQL GUI)
+
+Truy cập PgAdmin tại: `http://localhost:5050`
+
+- **Email:** admin@admin.com
+- **Password:** admin
+
+### Redis Commander
+
+Truy cập Redis Commander tại: `http://localhost:8081`
+
+## 📁 Cấu trúc project
+
+```
+NumberGuessing-BE/
+├── src/main/java/com/example/Immobi/
+│   ├── Controller/          # REST Controllers
+│   ├── Service/            # Business Logic
+│   ├── Repository/         # Data Access Layer
+│   ├── Entity/             # JPA Entities
+│   ├── Dto/                # Data Transfer Objects
+│   ├── Core/               # Core configurations
+│   └── ImmobiApplication.java
+├── src/main/resources/
+│   ├── application.properties
+│   └── static/
+├── docker-compose.yml      # Docker services
+├── Dockerfile             # API container
+└── build.gradle           # Dependencies
 ```
 
-## Cấu hình
+## 📝 Notes
 
-Các cấu hình chính của ứng dụng nằm trong file `src/main/resources/application.properties`.
+- JWT token có thời hạn 24 giờ
+- Redis được sử dụng để cache leaderboard và player profiles
+- Database sẽ tự động tạo tables khi khởi động lần đầu
+- Tất cả API endpoints (trừ auth) yêu cầu JWT token
 
-### Database
+## 🤝 Contributing
 
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/guessing_game
-spring.datasource.username=postgres
-spring.datasource.password=postgres
-```
-
-### Redis
-
-```properties
-spring.redis.host=localhost
-spring.redis.port=6379
-```
-
-### Server Port
-
-```properties
-server.port=9002
-```
-
-## Xử lý sự cố
-
-### Kết nối database thất bại
-
-Kiểm tra PostgreSQL đã chạy và có thể kết nối:
-
-```bash
-docker ps | grep postgres
-docker logs guessing-game-db
-```
-
-### Redis không khả dụng
-
-Kiểm tra Redis đã chạy và có thể kết nối:
-
-```bash
-docker ps | grep redis
-docker logs guessing-game-redis
-```
-
-### Backend không khởi động
-
-Kiểm tra logs của container:
-
-```bash
-docker logs guessing-game-api
-```
+1. Fork project
+2. Tạo feature branch
+3. Commit changes
+4. Push to branch
+5. Tạo Pull Request
