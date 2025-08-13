@@ -97,18 +97,18 @@ public class LeaderboardService {
                 
                 if (parts.length >= 1) {
                     String currentUserId = parts[0];
-                    
-                    if (userIdStr.equals(currentUserId)) {
-                        return rank + 1; // 1-based rank
-                    }
-                    
                     Double currentScore = redisTemplate.opsForZSet().score(LEADERBOARD_KEY, memberValue);
+
                     if (Objects.equals(currentScore, lastScore)) {
                         duplicateRankCounter++;
                     } else {
                         rank += duplicateRankCounter + 1;
                         duplicateRankCounter = 0;
                         lastScore = currentScore;
+                    }
+
+                    if (userIdStr.equals(currentUserId)) {
+                        return rank; // 1-based rank
                     }
                 }
             }

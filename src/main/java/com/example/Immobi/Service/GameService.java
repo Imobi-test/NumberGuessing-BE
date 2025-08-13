@@ -51,37 +51,29 @@ public class GameService {
         GameStats playerStats = getPlayerStatsWithLock(player);
         validatePlayerHasTurnsRemaining(playerStats);
         
-        int guessedNumber = guessRequest.getNumber();
         int generatedNumber;
         boolean isCorrect;
-        boolean scoreChanged = false;
-        
-        if (determineWinByProbability()) {
-            generatedNumber = guessedNumber;
-            isCorrect = true;
-        } else {
-            generatedNumber = generateDifferentNumber(guessedNumber);
-            isCorrect = false;
-        }
-        
+        int guessedNumber = guessRequest.getNumber();
+
+        isCorrect = determineWinByProbability();
+        generatedNumber = isCorrect ? guessedNumber : generateDifferentNumber(guessedNumber);
+
+        // Consume turn
         playerStats.consumeTurn();
+
+        // Update Redis Sorted Set for real-time leaderboard
         if (isCorrect) {
             playerStats.awardPoint();
-            scoreChanged = true;
+            leaderboardService.updatePlayerScore(player.getId(), player.getUsername(), playerStats.getScore());
+            log.info("Updated score in leaderboard for user ID: {}", player.getId());
         }
-        
+
+        // Profile refresh
+        playerService.refreshPlayerProfile(player.getId());
+
         // Save changes to database
-        GameStats updatedStats = gameStatsRepository.save(playerStats);
-        
-        // If score changed, update Redis Sorted Set for real-time leaderboard
-        if (scoreChanged) {
-            leaderboardService.updatePlayerScore(player.getId(), player.getUsername(), updatedStats.getScore());
-            log.debug("Updated score in leaderboard for user ID: {}", player.getId());
-        } else {
-            // Only profile needs refresh for turn count change
-            playerService.refreshPlayerProfile(player.getId());
-        }
-        
+        gameStatsRepository.save(playerStats);
+
         return createGuessResponse(
             isCorrect,
             generatedNumber, 
