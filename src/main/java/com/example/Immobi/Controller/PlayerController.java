@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
+ * Author: QuanNH
  * Controller for player-related endpoints
  */
 @RestController

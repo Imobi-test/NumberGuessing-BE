@@ -54,16 +54,6 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
-        // Check if the exception is for username already exists
-        if (e.getMessage().contains("Username already exists")) {
-            ErrorResponse error = new ErrorResponse(
-                    HttpStatus.BAD_REQUEST.value(),
-                    "Username already exists",
-                    LocalDateTime.now()
-            );
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
-        
         // Default illegal argument handling
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),

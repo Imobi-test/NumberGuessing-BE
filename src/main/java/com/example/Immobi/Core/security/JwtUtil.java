@@ -106,16 +106,6 @@ public class JwtUtil {
     }
 
     /**
-     * Generates a token with custom claims
-     * @param userDetails User details
-     * @param additionalClaims Additional claims to include in token
-     * @return Generated JWT token
-     */
-    public String generateToken(UserDetails userDetails, Map<String, Object> additionalClaims) {
-        return createToken(additionalClaims, userDetails.getUsername());
-    }
-
-    /**
      * Creates a JWT token
      * @param claims Claims to include in token
      * @param subject Subject (username)
